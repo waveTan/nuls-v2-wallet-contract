@@ -6,7 +6,7 @@
       </div>
       <div class="nav">
         <el-menu mode="horizontal" :default-active="navActives($route.path)" @select="handleSelect">
-          <el-menu-item index="home">{{$t('nav.wallet')}}</el-menu-item>
+          <!--<el-menu-item index="home">{{$t('nav.wallet')}}</el-menu-item>-->
           <el-menu-item index="contract" :disabled="addressList.length === 0">{{$t('nav.contracts')}}</el-menu-item>
         </el-menu>
       </div>

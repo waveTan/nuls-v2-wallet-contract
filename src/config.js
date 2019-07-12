@@ -13,6 +13,8 @@ export let API_URL = localStorage.hasOwnProperty("urls") ? JSON.parse(localStora
 setInterval(() => {
   API_URL = localStorage.hasOwnProperty("urls") ? JSON.parse(localStorage.getItem("urls")).urls : 'http://apitn1.nulscan.io/';
 }, 500);
+//正式、测试网络的api
+export let LOCALHOST_API_URL = 'http://192.168.1.40:80/offlineSmartContract';
 //请求最迟时间
 export const API_TIME = IS_DEV ? '9000' : '8000';
 //默认节点服务列表

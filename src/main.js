@@ -4,11 +4,12 @@ import router from './router'
 import store from './store'
 import './plugins/element.js'
 import i18n from './i18n'
-import {post} from './api/https'
+import {post,localhostPost} from './api/https'
 
 Vue.config.productionTip = false;
 //定义全局变量
 Vue.prototype.$post = post;
+Vue.prototype.$localhostPost = localhostPost;
 
 new Vue({
   router,

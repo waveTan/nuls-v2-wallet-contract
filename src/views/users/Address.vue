@@ -43,15 +43,6 @@
       </el-table>
       <div class="pages">
         <div class="page-total">{{$t('public.total')}} {{addressList.length}}</div>
-        <!--<div class="page-total">显示1-20 共 1000</div>-->
-        <!-- <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" class="fr"
-                        :current-page="currentPage4"
-                        :page-sizes="[100, 200, 300, 400]"
-                        background
-                        :page-size="100"
-                        layout=" prev, pager, next, jumper"
-                        :total="400">
-         </el-pagination>-->
       </div>
     </div>
 

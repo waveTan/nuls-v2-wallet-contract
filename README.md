@@ -1,4 +1,4 @@
-# wallet_2.0
+# NULS Wallet 2.0 Contract web
 
 ## Project setup
 ```

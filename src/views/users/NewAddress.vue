@@ -74,7 +74,7 @@
         </div>
 
         <div class="btn mb_20">
-          <el-button type="success" @click="backKeystore" v-show="RUN_PATTERN">{{$t('newAddress.newAddress16')}}
+          <el-button type="success" @click="backKeystore" >{{$t('newAddress.newAddress16')}}
           </el-button>
           <el-button type="text" @click="backKey">{{$t('newAddress.newAddress17')}}</el-button>
           <el-button type="info" @click="goWallet" v-show="false">{{$t('newAddress.newAddress18')}}</el-button>
@@ -106,6 +106,7 @@
   import BackBar from '@/components/BackBar'
   import {copys, chainID, chainIdNumber, defaultAddressInfo, localStorageByAddressInfo} from '@/api/util'
   import {RUN_PATTERN} from '@/config.js'
+  import axios from 'axios'
 
   export default {
     data() {
@@ -137,9 +138,9 @@
         keyDialog: false, //key弹框
         ifAddressInfo: localStorage.hasOwnProperty(chainIdNumber),//判断是否账户地址
         passwordForm: {
-          pass: '',
-          checkPass: '',
-          agreement: '',
+          pass: 'nuls123456',
+          checkPass: 'nuls123456',
+          agreement: true,
         },
         passwordRules: {
           pass: [
@@ -181,13 +182,26 @@
       submitPasswordForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.newAddressInfo = nuls.newAddress(chainID(), this.passwordForm.pass);
-            let newAddressInfo = defaultAddressInfo;
-            newAddressInfo.address = this.newAddressInfo.address;
-            newAddressInfo.aesPri = this.newAddressInfo.aesPri;
-            newAddressInfo.pub = this.newAddressInfo.pub;
-            localStorageByAddressInfo(newAddressInfo);
-            this.isFirst = false;
+            const url = 'http://192.168.1.40:80/offlineSmartContract';
+            const params = {
+              "jsonrpc": "2.0",
+              "method": "createAccount",
+              "params": [chainID(), this.passwordForm.pass],
+              "id": 5898
+            };
+            axios.post(url, params)
+              .then((response) => {
+                //console.log(response.data);
+                if (response.data.hasOwnProperty('result')) {
+                  let newAddressInfo = defaultAddressInfo;
+                  newAddressInfo.address = response.data.result.address;
+                  localStorageByAddressInfo(newAddressInfo);
+                  this.newAddressInfo = newAddressInfo;
+                  this.isFirst = false;
+                }
+              }).catch((err) => {
+              console.log(err)
+            })
           } else {
             return false;
           }
@@ -215,11 +229,12 @@
        * @param password
        **/
       passSubmit(password) {
-        let that = this;
-        const pri = nuls.decrypteOfAES(this.newAddressInfo.aesPri, password);
-        let chainid = this.$route.query.backAddressInfo ? this.$route.query.backAddressInfo.chainId : chainID();
-        const newAddressInfo = nuls.importByKey(chainid, pri, password);
-        if (newAddressInfo.address === this.newAddressInfo.address) {
+        if (this.backType === 0) {
+          console.log("备份私钥");
+        }else {
+          console.log("备份keystory");
+        }
+        /*if (newAddressInfo.address === this.newAddressInfo.address) {
           if (this.backType === 0) {
             const {dialog} = require('electron').remote;
             //console.log(dialog);
@@ -263,7 +278,7 @@
           }
         } else {
           this.$message({message: this.$t('address.address13'), type: 'error', duration: 1000});
-        }
+        }*/
       },
 
       /**
