@@ -51,7 +51,8 @@
   import BackBar from '@/components/BackBar'
   import Password from '@/components/PasswordBar'
   import {chainID, defaultAddressInfo, localStorageByAddressInfo} from '@/api/util'
-  import {RUN_PATTERN} from '@/config.js'
+  import {RUN_PATTERN, LOCALHOST_API_URL, PARAMETER} from '@/config.js'
+  import axios from 'axios'
 
   export default {
     data() {
@@ -163,18 +164,20 @@
        * @param password
        **/
       passSubmit(password) {
-        const pri = nuls.decrypteOfAES(this.keystoreInfo.encryptedPrivateKey, password);
-        const newAddressInfo = nuls.importByKey(chainID(), pri, password);
-        if (newAddressInfo.address === this.keystoreInfo.address) {
-          let newImportAddressInfo = defaultAddressInfo;
-          newImportAddressInfo.address = newAddressInfo.address;
-          newImportAddressInfo.aesPri = newAddressInfo.aesPri;
-          newImportAddressInfo.pub = newAddressInfo.pub;
-          localStorageByAddressInfo(newImportAddressInfo);
-          this.toUrl('address')
-        } else {
-          this.$message({message: this.$t('address.address13'), type: 'error', duration: 1000});
-        }
+        PARAMETER.method = 'importAccountByPriKey';
+        PARAMETER.params = [chainID(), this.keystoreInfo.encryptedPrivateKey,password,true];
+        axios.post(LOCALHOST_API_URL, PARAMETER)
+          .then((response) => {
+            //console.log(response.data);
+            if (response.data.hasOwnProperty('result')) {
+              let newImportAddressInfo = defaultAddressInfo;
+              newImportAddressInfo.address = response.data.result.address;
+              localStorageByAddressInfo(newImportAddressInfo);
+              this.toUrl('address')
+            }
+          }).catch((err) => {
+          console.log(err)
+        });
       },
 
       /**

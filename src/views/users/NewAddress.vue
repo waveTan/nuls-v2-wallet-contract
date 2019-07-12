@@ -74,7 +74,7 @@
         </div>
 
         <div class="btn mb_20">
-          <el-button type="success" @click="backKeystore" >{{$t('newAddress.newAddress16')}}
+          <el-button type="success" @click="backKeystore" v-show="false">{{$t('newAddress.newAddress16')}}
           </el-button>
           <el-button type="text" @click="backKey">{{$t('newAddress.newAddress17')}}</el-button>
           <el-button type="info" @click="goWallet" v-show="false">{{$t('newAddress.newAddress18')}}</el-button>
@@ -105,7 +105,7 @@
   import Password from '@/components/PasswordBar'
   import BackBar from '@/components/BackBar'
   import {copys, chainID, chainIdNumber, defaultAddressInfo, localStorageByAddressInfo} from '@/api/util'
-  import {RUN_PATTERN} from '@/config.js'
+  import {RUN_PATTERN, LOCALHOST_API_URL, PARAMETER} from '@/config.js'
   import axios from 'axios'
 
   export default {
@@ -182,14 +182,9 @@
       submitPasswordForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            const url = 'http://192.168.1.40:80/offlineSmartContract';
-            const params = {
-              "jsonrpc": "2.0",
-              "method": "createAccount",
-              "params": [chainID(), this.passwordForm.pass],
-              "id": 5898
-            };
-            axios.post(url, params)
+            PARAMETER.method = 'createAccount';
+            PARAMETER.params = [chainID(), this.passwordForm.pass];
+            axios.post(LOCALHOST_API_URL, PARAMETER)
               .then((response) => {
                 //console.log(response.data);
                 if (response.data.hasOwnProperty('result')) {
@@ -229,56 +224,20 @@
        * @param password
        **/
       passSubmit(password) {
-        if (this.backType === 0) {
-          console.log("备份私钥");
-        }else {
-          console.log("备份keystory");
-        }
-        /*if (newAddressInfo.address === this.newAddressInfo.address) {
-          if (this.backType === 0) {
-            const {dialog} = require('electron').remote;
-            //console.log(dialog);
-            dialog.showOpenDialog({
-              title: that.$t('newAddress.newAddress28'),
-              properties: ['openFile', 'openDirectory']
-            }, function (files) {
-              //console.log(files);
-              if (files) {
-                let fileName = files + '/' + newAddressInfo.address + '.keystore';
-                let fileInfo = {
-                  address: newAddressInfo.address,
-                  encryptedPrivateKey: newAddressInfo.aesPri,
-                  pubKey: newAddressInfo.pubKey,
-                  priKey: null
-                };
-                if (RUN_PATTERN) {
-                  //console.log(JSON.stringify(fileInfo));
-                  let fs = require("fs");
-                  fs.writeFile(fileName, JSON.stringify(fileInfo), 'utf8', function (error) {
-                    if (error) {
-                      that.$message({
-                        message: that.$t('newAddress.newAddress26') + error,
-                        type: 'error',
-                        duration: 1000
-                      });
-                      return false;
-                    }
-                    that.$message({
-                      message: that.$t('newAddress.newAddress27') + files,
-                      type: 'success',
-                      duration: 3000
-                    });
-                  })
-                }
+        if (this.backType === 1) {
+          PARAMETER.method = 'exportPriKeyByAddress';
+          PARAMETER.params = [chainID(), this.newAddressInfo.address, password];
+          axios.post(LOCALHOST_API_URL, PARAMETER)
+            .then((response) => {
+              //console.log(response.data.result);
+              if (response.data.hasOwnProperty('result')) {
+                this.newAddressInfo.pri = response.data.result.privateKey;
+                this.keyDialog = true;
               }
-            });
-          } else {
-            this.newAddressInfo.pri = pri;
-            this.keyDialog = true;
-          }
-        } else {
-          this.$message({message: this.$t('address.address13'), type: 'error', duration: 1000});
-        }*/
+            }).catch((err) => {
+            console.log(err);
+          })
+        }
       },
 
       /**

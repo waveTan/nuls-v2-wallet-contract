@@ -15,6 +15,9 @@ setInterval(() => {
 }, 500);
 //正式、测试网络的api
 export let LOCALHOST_API_URL = 'http://192.168.1.40:80/offlineSmartContract';
+export let PARAMETER = {jsonrpc: '2.0', method: '', params: [], id: 5898};
+
+
 //请求最迟时间
 export const API_TIME = IS_DEV ? '9000' : '8000';
 //默认节点服务列表

@@ -69,7 +69,9 @@
 <script>
   import nuls from 'nuls-sdk-js'
   import Password from '@/components/PasswordBar'
-  import {timesDecimals, chainIdNumber, addressInfo} from '@/api/util'
+  import {timesDecimals, chainIdNumber, addressInfo, chainID} from '@/api/util'
+  import {LOCALHOST_API_URL, PARAMETER} from '@/config.js'
+  import axios from 'axios'
 
   export default {
     data() {
@@ -96,6 +98,19 @@
        */
       getAddressList() {
         this.addressList = addressInfo(0);
+        PARAMETER.method = 'getAccountList';
+        PARAMETER.params = [chainID(), 1, 10];
+        axios.post(LOCALHOST_API_URL, PARAMETER)
+          .then((response) => {
+            //console.log(response.data);
+            if (response.data.hasOwnProperty('result')) {
+              console.log(response.data.result);
+            }
+          }).catch((err) => {
+          console.log(err)
+        });
+
+
         //如果没有账户跳转到创建地址界面
         if (this.addressList.length === 0) {
           this.$router.push({
