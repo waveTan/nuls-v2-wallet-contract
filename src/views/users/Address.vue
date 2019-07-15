@@ -19,19 +19,10 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('address.address4')" align="center">
-          <template slot-scope="scope">
-            <span v-show="scope.row.remark !=='' " @click="editRemark(scope.row)"
-                  class="click">{{scope.row.remark}}</span>
-            <span v-show="scope.row.remark ==='' " @click="editRemark(scope.row)">
-              <i class="el-icon-edit-outline click"></i>
-            </span>
-          </template>
-        </el-table-column>
         <el-table-column :label="$t('address.address5')" align="center" width="350">
           <template slot-scope="scope">
-            <label class="click tab_bn" @click="editPassword(scope.row)">{{$t('address.address6')}}</label>
-            <span class="tab_line">|</span>
+            <!-- <label class="click tab_bn" @click="editPassword(scope.row)">{{$t('address.address6')}}</label>
+             <span class="tab_line">|</span>-->
             <label class="click tab_bn" @click="backAddress(scope.row)">{{$t('address.address7')}}</label>
             <span class="tab_line">|</span>
             <label class="click tab_bn" @click="deleteAddress(scope.row)">{{$t('address.address8')}}</label>
@@ -96,21 +87,8 @@
       /**
        * 获取账户列表
        */
-      getAddressList() {
-        this.addressList = addressInfo(0);
-        PARAMETER.method = 'getAccountList';
-        PARAMETER.params = [chainID(), 1, 10];
-        axios.post(LOCALHOST_API_URL, PARAMETER)
-          .then((response) => {
-            //console.log(response.data);
-            if (response.data.hasOwnProperty('result')) {
-              console.log(response.data.result);
-            }
-          }).catch((err) => {
-          console.log(err)
-        });
-
-
+      async getAddressList() {
+        this.addressList = await addressInfo();
         //如果没有账户跳转到创建地址界面
         if (this.addressList.length === 0) {
           this.$router.push({
@@ -139,7 +117,7 @@
                   addressInfo.chainId = nuls.verifyAddress(item.address).chainId;
                 }
               }
-              localStorage.setItem(chainIdNumber(), JSON.stringify(this.addressList))
+              //localStorage.setItem(chainIdNumber(), JSON.stringify(this.addressList))
             }
           })
           .catch((error) => {
@@ -227,19 +205,17 @@
        * @param password
        **/
       passSubmit(password) {
-        let newAddressInfo = addressInfo(0);
-        const pri = nuls.decrypteOfAES(this.selectAddressInfo.aesPri, password);
-        const deleteAddressInfo = nuls.importByKey(this.selectAddressInfo.chainId, pri, password);
-        if (deleteAddressInfo.address === this.selectAddressInfo.address) {
-          newAddressInfo.splice(newAddressInfo.findIndex(item => item.address === this.selectAddressInfo.address), 1);
-          if (this.selectAddressInfo.selection && newAddressInfo.length !== 0) {
-            newAddressInfo[0].selection = true;
-          }
-          localStorage.setItem(chainIdNumber(), JSON.stringify(newAddressInfo));
-          this.getAddressList();
-        } else {
-          this.$message({message: this.$t('address.address13'), type: 'error', duration: 1000});
-        }
+        PARAMETER.method = 'deleteAccount';
+        PARAMETER.params = [chainID(), this.selectAddressInfo.address, password];
+        axios.post(LOCALHOST_API_URL, PARAMETER)
+          .then((response) => {
+            //console.log(response.data);
+            if (response.data.hasOwnProperty('result')) {
+              this.getAddressList()
+            }
+          }).catch((err) => {
+          console.log(err)
+        });
       },
 
       /**

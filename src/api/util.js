@@ -1,6 +1,7 @@
 import {BigNumber} from 'bignumber.js'
 import copy from 'copy-to-clipboard'
-import {explorerUrl} from '@/config.js'
+import {explorerUrl, LOCALHOST_API_URL, PARAMETER} from '@/config.js'
+import axios from 'axios'
 
 /**
  * 10的N 次方
@@ -87,25 +88,25 @@ export function chainIdNumber() {
 
 /**
  * 获取地址列表或选择地址
- * @param type 0:地址列表，1:选中地址
  * @returns {*}
  */
-export function addressInfo(type) {
-  let chainNumber = 'chainId' + chainID();
-  let addressList = localStorage.hasOwnProperty(chainNumber) ? JSON.parse(localStorage.getItem(chainNumber)) : [];
-  if (addressList) {
-    if (type === 0) {
-      return addressList
-    } else {
-      for (let item  of addressList) {
-        if (item.selection) {
-          return item
+export async function addressInfo() {
+  let accountList = {};
+  PARAMETER.method = 'getAccountList';
+  PARAMETER.params = [chainID(), 1, 10];
+  await axios.post(LOCALHOST_API_URL, PARAMETER)
+    .then((response) => {
+      //console.log(response.data);
+      if (response.data.hasOwnProperty('result')) {
+        for (let item of response.data.result.list) {
+          item.balance = timesDecimals(item.balance);
         }
+        accountList = response.data.result.list;
       }
-    }
-  } else {
-    return addressList
-  }
+    }).catch((err) => {
+      console.log(err)
+    });
+  return accountList;
 }
 
 /**

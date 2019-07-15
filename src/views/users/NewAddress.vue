@@ -104,7 +104,7 @@
   import nuls from 'nuls-sdk-js'
   import Password from '@/components/PasswordBar'
   import BackBar from '@/components/BackBar'
-  import {copys, chainID, chainIdNumber, defaultAddressInfo, localStorageByAddressInfo} from '@/api/util'
+  import {copys, chainID, chainIdNumber, addressInfo, defaultAddressInfo, localStorageByAddressInfo} from '@/api/util'
   import {RUN_PATTERN, LOCALHOST_API_URL, PARAMETER} from '@/config.js'
   import axios from 'axios'
 
@@ -190,9 +190,9 @@
                 if (response.data.hasOwnProperty('result')) {
                   let newAddressInfo = defaultAddressInfo;
                   newAddressInfo.address = response.data.result.address;
-                  localStorageByAddressInfo(newAddressInfo);
                   this.newAddressInfo = newAddressInfo;
                   this.isFirst = false;
+                  this.getAddressList();
                 }
               }).catch((err) => {
               console.log(err)
@@ -201,6 +201,16 @@
             return false;
           }
         });
+      },
+
+      /**
+       * 获取账户列表
+       */
+      async getAddressList() {
+        let accountList = await addressInfo();
+        if (accountList.length === 1) {
+          localStorage.setItem(chainIdNumber(), this.newAddressInfo.address)
+        }
       },
 
       /**

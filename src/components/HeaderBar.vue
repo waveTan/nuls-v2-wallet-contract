@@ -60,9 +60,9 @@
       this.getAddressList();
     },
     mounted() {
-      setInterval(() => {
+     /* setInterval(() => {
         this.getAddressList();
-      }, 500)
+      }, 500)*/
     },
     methods: {
 
@@ -118,8 +118,8 @@
       /**
        * 获取账户列表
        */
-      getAddressList() {
-        this.addressList = addressInfo(0);
+      async getAddressList() {
+        this.addressList = await addressInfo();
         if (this.addressList) {
           for (let item  of this.addressList) {
             item.addresss = superLong(item.address, 8);

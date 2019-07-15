@@ -41,11 +41,9 @@ export function post(url, methodName, data = []) {
  */
 export function localhostPost(url, methodName, data = []) {
   axios.defaults.baseURL = config.LOCALHOST_API_URL;
-  console.log( config.LOCALHOST_API_URL);
   return new Promise((resolve, reject) => {
     data.unshift(chainID());
     const params = {"jsonrpc": "2.0", "method": methodName, "params": data, "id": 5898};
-    console.log(params);
     axios.post(url, params)
       .then(response => {
         resolve(response.data);

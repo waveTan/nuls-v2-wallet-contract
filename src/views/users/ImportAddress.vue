@@ -203,7 +203,6 @@
         newImportAddressInfo.address = importAddressInfo.address;
         newImportAddressInfo.aesPri = importAddressInfo.aesPri;
         newImportAddressInfo.pub = importAddressInfo.pub;
-        localStorageByAddressInfo(newImportAddressInfo);
         this.toUrl('address')
       },
 
